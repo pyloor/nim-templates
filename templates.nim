@@ -14,7 +14,7 @@ const identChars = {'a'..'z', 'A'..'Z', '0'..'9', '_'}
 
 
 # Procedure Declarations
-proc parse_template(node: PNimrodNode, value: string) {.compiletime.}
+proc parse_template(node: NimNode, value: string) {.compiletime.}
 
 
 # Procedure Definitions
@@ -162,7 +162,7 @@ iterator parse_compound_statements(value, identifier: string, index: int): strin
             get_next_ident(["try", "$except", "$finally"])
 
 
-proc parse_complex_stmt(value, identifier: string, index: var int): PNimrodNode {.compiletime.} =
+proc parse_complex_stmt(value, identifier: string, index: var int): NimNode {.compiletime.} =
     ## Parses if/when/try /elif /else /except /finally statements
 
     # Build up complex statement string
@@ -214,7 +214,7 @@ proc parse_complex_stmt(value, identifier: string, index: var int): PNimrodNode 
         inc(resultIndex)
 
 
-proc parse_simple_statement(value: string, index: var int): PNimrodNode {.compiletime.} =
+proc parse_simple_statement(value: string, index: var int): NimNode {.compiletime.} =
     ## Parses for/while
 
     # Detect indentation
@@ -248,7 +248,7 @@ proc parse_simple_statement(value: string, index: var int): PNimrodNode {.compil
     inc(index, value.parse_thru_eol(index))
 
 
-proc parse_until_symbol(node: PNimrodNode, value: string, index: var int): bool {.compiletime.} =
+proc parse_until_symbol(node: NimNode, value: string, index: var int): bool {.compiletime.} =
     ## Parses a string until a $ symbol is encountered, if
     ## two $$'s are encountered in a row, a split will happen
     ## removing one of the $'s from the resulting output
@@ -307,12 +307,12 @@ proc parse_until_symbol(node: PNimrodNode, value: string, index: var int): bool 
         node.insert insertionPoint, newCall("add", ident("result"), newStrLitNode(splitValue))
 
 
-proc parse_template(node: PNimrodNode, value: string) =
+proc parse_template(node: NimNode, value: string) =
     ## Parses through entire template, outputing valid
     ## Nimrod code into the input `node` AST.
     var index = 0
     while index < value.len and
-          parse_until_symbol(node, value, index): nil
+          parse_until_symbol(node, value, index): discard
 
 
 macro tmpli*(body: expr): stmt =
